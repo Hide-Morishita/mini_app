@@ -11,6 +11,15 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   def create
+    ## sns認証(password自動生成)
+    if params[:sns_auth] == 'true'  #params[:sns_auth]を取得した時
+      pass = Devise.friendly_token  #Devise.friendly_tokenでpassword自動生成
+      params[:user][:password] = pass
+      params[:user][:password_confirmation] = pass
+    end
+    ## sns認証
+
+    ## wizard
     @user = User.new(sign_up_params)
       unless @user.valid?   #バリデーションの結果がfalseだったらnewへ戻る
         render :new and return
@@ -21,6 +30,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     # binding.pry
     @address = @user.build_address  #userに紐付いたaddressモデルのインスタンスを生成
     render :new_address
+    ## wizard
   end
 
   def create_address
